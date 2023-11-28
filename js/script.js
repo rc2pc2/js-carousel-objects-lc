@@ -24,43 +24,51 @@ const images = [
         title: 'Colombia',
         description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et temporibus voluptatum suscipit tempore aliquid deleniti aut veniam.'
     },
-    {
-        url: 'https://cdn.theatlantic.com/thumbor/47zvirkGdVhgHefPrzCT4esAyBQ=/900x568/media/img/photo/2012/05/scenes-from-brazil/b01_05118020/original.jpg',
-        title: 'Brazil',
-        description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et temporibus voluptatum suscipit tempore aliquid deleniti aut veniam.'
-    }
+    // {
+    //     url: 'https://cdn.theatlantic.com/thumbor/47zvirkGdVhgHefPrzCT4esAyBQ=/900x568/media/img/photo/2012/05/scenes-from-brazil/b01_05118020/original.jpg',
+    //     title: 'Brazil',
+    //     description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et temporibus voluptatum suscipit tempore aliquid deleniti aut veniam.'
+    // }
 ];
 
 const slidesWrapperEl =document.querySelector('div.my-carousel-images');
+const thumnbailsWrapperEl =document.querySelector('div.my-thumbnails');
 
 let activeIndex = 0;
 
 images.forEach((element, index) => {
     const classesForActiveSlide = (index === activeIndex) ? 'active' : '';
     slidesWrapperEl.innerHTML += generateNewSlide(element.url, element.title, element.description, index, classesForActiveSlide);
+
+    const newThumbmnailEl = generateNewThumbnail(element.url, element.title, index, classesForActiveSlide);
+
+    newThumbmnailEl.addEventListener('click', function(){
+        changeToSlide(index);
+        activeIndex = index;
+    })
+
+    thumnbailsWrapperEl.appendChild(newThumbmnailEl);
 });
 
-document.querySelector('#btn-prev').addEventListener('click', function(){
-    if (--activeIndex < 0){
-        activeIndex = images.length - 1;
-    }
+let clock;
 
+document.querySelector('#btn-prev').addEventListener('click', function(){
+    if (--activeIndex < 0) activeIndex = images.length - 1;
     changeToSlide(activeIndex);
 })
-
 
 document.querySelector('#btn-next').addEventListener('click', function(){
-    if (++activeIndex >= images.length){
-        activeIndex = 0;
-    }
-
+    if (++activeIndex >= images.length) activeIndex = 0;
     changeToSlide(activeIndex);
 })
 
+clock = setInterval(function(){
+    document.querySelector('#btn-next').click();
+}, 500);
 
 
-
-
+//  dopo tot secondi
+//  elemento prev.click()
 
 
 
@@ -82,12 +90,28 @@ function generateNewSlide(imgSrc, title, description, index, classesToAdd ){
     </div>`;
 }
 
+function generateNewThumbnail(imgSrc, title, index, classesToAdd){
+    const newThumbnailEl = document.createElement('article');
+    newThumbnailEl.classList.add('my-thumbnail-item');
+
+    if (classesToAdd.length >= 1){
+        newThumbnailEl.classList.add('active');
+    }
+
+    newThumbnailEl.setAttribute('thumbnail-item', index)
+    newThumbnailEl.innerHTML = `<img src="${imgSrc}" alt="${title}'s thumbnail picture">`;
+
+    return newThumbnailEl;
+}
+
 
 
 function changeToSlide(newIndex){
     document.querySelector('div.my-carousel-item.active').classList.remove('active');
+    document.querySelector('article.my-thumbnail-item.active').classList.remove('active');
 
     document.querySelector('div.my-carousel-item[carousel-item="' + newIndex +'"]').classList.add('active');
+    document.querySelector('article.my-thumbnail-item[thumbnail-item="' + newIndex +'"]').classList.add('active');
 }
 
 
